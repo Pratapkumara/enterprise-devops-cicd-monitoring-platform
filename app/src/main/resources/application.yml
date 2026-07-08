@@ -40,3 +40,7 @@ info:
     description: Production Ready Enterprise DevOps CI/CD Monitoring Platform
     java-version: 21
     spring-boot-version: 3.5.3
+
+app:
+  name: Enterprise DevOps CI/CD Monitoring Platform
+  version: 1.0.0
