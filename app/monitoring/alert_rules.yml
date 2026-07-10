@@ -1,0 +1,29 @@
+groups:
+  - name: application-alerts
+    rules:
+      - alert: ApplicationDown
+        expr: up{job="enterprise-devops-platform"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Spring Boot application is down"
+          description: "Spring Boot application has been unreachable for more than 1 minute"
+
+      - alert: HighCpuUsage
+        expr: process_cpu_usage > 0.80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "Application CPU usage is above 80%"
+
+      - alert: HighMemoryUsage
+        expr: jvm_memory_used_bytes / jvm_memory_max_bytes > 0.85
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High JVM memory usage"
+          description: "JVM memory usage crossed 85%"
