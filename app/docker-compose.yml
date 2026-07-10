@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
 
   enterprise-devops-app:
@@ -13,12 +15,13 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./monitoring/alert_rules.yml:/etc/prometheus/alert_rules.yml
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alert_rules.yml:/etc/prometheus/alert_rules.yml:ro
     depends_on:
       - enterprise-devops-app
       - alertmanager
       - node-exporter
+      - cadvisor
     restart: always
 
   grafana:
@@ -27,8 +30,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
     depends_on:
       - prometheus
     restart: always
@@ -39,9 +42,10 @@ services:
     ports:
       - "9093:9093"
     volumes:
-      - ./monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - ./monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
     command:
       - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--log.level=debug"
     restart: always
 
   node-exporter:
@@ -51,6 +55,7 @@ services:
       - "9100:9100"
     pid: host
     restart: always
+
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
@@ -58,10 +63,10 @@ services:
       - "8085:8080"
     privileged: true
     devices:
-      - /dev/kmsg:/dev/kmsg
+      - "/dev/kmsg:/dev/kmsg"
     volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker:/var/lib/docker:ro
+      - "/:/rootfs:ro"
+      - "/var/run:/var/run:ro"
+      - "/sys:/sys:ro"
+      - "/var/lib/docker:/var/lib/docker:ro"
     restart: always
